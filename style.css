@@ -80,3 +80,8 @@ button {
     font-weight: 600;
     font-size: 24px;
 }
+
+.title {
+    font-size: 100px;
+    font-weight: 6px;
+}
