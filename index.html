@@ -1,49 +1,77 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html> <!-- Declares the document type as HTML5 -->
+<html lang="en"> <!-- Starts the HTML document with English language settings -->
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+  <meta charset="UTF-8" /> <!-- Sets character encoding to UTF-8 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/> <!-- Makes layout responsive on different devices -->
+  <link rel="stylesheet" href="style.css" /> <!-- Links to external CSS stylesheet -->
+  <title>Turn-Based Battle</title> <!-- Sets the browser tab title -->
+  <style>
+    body {
+      background-image: url('backgroundimage.jpeg'); /* Adds background image to page */
+      background-size: cover; /* Ensures image covers entire background */
+      background-repeat: no-repeat; /* Prevents the image from repeating */
+      background-position: center; /* Centers the image */
+    }
+  </style>
 </head>
 <body>
-    <h2 id="title">Fight!</h2>
-    <div id="gameOverScreen">
-        <h2>GAME OVER!</h2>
-        <h3 id="winningPlayer"></h3>
+
+  <h2 id="title" class="title">Fight!</h2>
+
+  <div id="gameOverScreen" style="display: none;"> <!-- Game over screen initially hidden -->
+    <h2>GAME OVER!</h2> <!-- Game over heading -->
+    <h3 id="winningPlayer"></h3> <!-- Displays which player won -->
+  </div>
+
+  <div id="playerTurn"> <!-- Shows whose turn it is -->
+    <h2><span id="playerName">Player 1</span>'s turn!</h2> <!-- Player turn label -->
+  </div>
+
+  <div id="fightingSpace"> <!-- Main game area where players appear -->
+
+    <!-- Player 1 Panel -->
+    <div class="player" id="playerOne"> <!-- Wrapper for Player 1 UI -->
+      <h2>Player 1</h2> <!-- Player 1 label -->
+      <div class="healthSection"> <!-- Player 1 health display -->
+        <span>Health: </span><span id="playerOneHealth">100</span> <!-- Starting health -->
+      </div>
+      <div class="playerSpace"> <!-- Contains Player 1 sprite and controls -->
+        <img id="playerOneSprite" class="idle" src="R_Idle.png" /> <!-- Player 1 idle image -->
+        <span>
+          Image by
+          <a
+            href="https://www.freepik.com/free-vector/set-warrior-different-postures_1354461.htm#query=robot%20sprite&position=8&from_view=keyword&track=ais"
+            >Freepik</a
+          > <!-- Attribution for sprite art -->
+        </span>
+        <button id="playerOneAttack" class="active" onclick="attackPlayerTwo()">Attack!</button> <!-- Player 1's attack button -->
+      </div>
     </div>
-    <div id="playerTurn">
-        <h2><span id="playerName">Player 1</span>'s turn!</h2>
+
+    <!-- Player 2 Panel -->
+    <div class="player" id="playerTwo"> <!-- Wrapper for Player 2 UI -->
+      <h2>Player 2</h2> <!-- Player 2 label -->
+      <div class="healthSection"> <!-- Player 2 health display -->
+        <span>Health: </span><span id="playerTwoHealth">100</span> <!-- Starting health -->
+      </div>
+      <div class="playerSpace"> <!-- Contains Player 2 sprite and controls -->
+        <img id="playerTwoSprite" class="idle" src="L_Idle.png" /> <!-- Player 2 idle image -->
+        <span>
+          Image by
+          <a
+            href="https://www.freepik.com/free-vector/set-warrior-different-postures_1354461.htm#query=robot%20sprite&position=8&from_view=keyword&track=ais"
+            >Freepik</a
+          > <!-- Attribution for sprite art -->
+        </span>
+        <button id="playerTwoAttack" class="inactive" onclick="attackPlayerOne()" disabled>Attack!</button> <!-- Player 2's attack button initially disabled -->
+      </div>
     </div>
-    <div id="fightingSpace">
-        <div class="player" id='playerOne'>
-            <h2>Player 1</h2>
-            <div class="healthSection">
-                <span>Health: </span><span id="playerOneHealth">100</span>
-            </div>
-            <div class="playerSpace">
-                <img id="playerOneSprite" class="idle" src="R_Idle.png" alt="">
-                <span>Image by <a
-                        href="https://www.freepik.com/free-vector/set-warrior-different-postures_1354461.htm#query=robot%20sprite&position=8&from_view=keyword&track=ais">
-                        Freepik</a></span>
-                <button id="playerOneAttack" class="inactive" onclick="attackPlayerOne()">Attack!</button>
-            </div>
-        </div>
-        <div class="player" id='playerTwo'>
-            <h2>Player 2</h2>
-            <div class="healthSection">
-                <span>Health: </span><span id="playerTwoHealth"> 100</span>
-            </div>
-            <div class="playerSpace">
-                <img id="playerTwoSprite" class="idle" src="L_Idle.png" alt="">
-                <span>Image by <a
-                        href="https://www.freepik.com/free-vector/set-warrior-different-postures_1354461.htm#query=robot%20sprite&position=8&from_view=keyword&track=ais">
-                        Freepik</a></span>
-                <button id="playerTwoAttack" class="active" onclick="attackPlayerTwo()">Attack!</button>
-            </div>
-        </div>
-        <div><audio id="SFX_PlayerDamage" src="audio/SFX_PlayerDamage.wav"></audio></div>
-    </div>
-    <script src="script.js"></script>
+
+    <!-- Sound Effect Element -->
+    <audio id="SFX_PlayerDamage" src="boing.mp3"></audio> <!-- Audio for hit sound -->
+  </div>
+
+  <!-- Game Logic Script -->
+  <script src="script.js"></script> <!-- Links external JavaScript logic file -->
 </body>
 </html>

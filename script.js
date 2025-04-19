@@ -1,147 +1,132 @@
-// these values are set at the beginning
-// and then used throughout the game
+
+
+// Track the state of the game, including how many players, whose turn, and if it's over
 let gameState = {
-    players: 2,
-    whoseTurn: 1,
-    gameOver: false
-}
-
-
-// function that considers which player's turn it is and then
-// changes the UI accordingly
-function changePlayer() {
-    // if the current player is player 1 at the end of a move
+    players: 2, // total players in the game
+    whoseTurn: 1, // starts with Player 1
+    gameOver: false // flag to track if game has ended
+  };
+  
+  // Function triggered when Player 1 attacks Player 2
+  function attackPlayerTwo() {
+    // Only allow this if it's Player 1's turn and the game isn't over
+    if (gameState.whoseTurn !== 1 || gameState.gameOver) return;
+  
+    // Grab Player 2's health element
+    const playerTwoHealth = document.getElementById("playerTwoHealth");
+    // Parse the number value of health and reduce by 10, ensuring it doesn't go below 0
+    let newHealth = Math.max(0, Number(playerTwoHealth.innerText) - 10);
+    playerTwoHealth.innerText = newHealth; // update the health visually
+  
+    // Trigger visual and sound effects
+    animateAttack("playerOneSprite", "playerTwoSprite");
+  
+    // If Player 2's health drops to 0 or below, end the game
+    if (newHealth <= 0) {
+      gameOver();
+      return;
+    }
+  
+    // Change to Player 2's turn
+    changePlayer();
+  }
+  
+  // Function triggered when Player 2 attacks Player 1
+  function attackPlayerOne() {
+    // Only allow if it's Player 2's turn and game isn't over
+    if (gameState.whoseTurn !== 2 || gameState.gameOver) return;
+  
+    // Grab Player 1's health element
+    const playerOneHealth = document.getElementById("playerOneHealth");
+    // Reduce Player 1's health by 10, ensuring it stays >= 0
+    let newHealth = Math.max(0, Number(playerOneHealth.innerText) - 10);
+    playerOneHealth.innerText = newHealth;
+  
+    // Trigger attack animation and sound
+    animateAttack("playerTwoSprite", "playerOneSprite");
+  
+    // Check if Player 1 has been defeated
+    if (newHealth <= 0) {
+      gameOver();
+      return;
+    }
+  
+    // Change to Player 1's turn
+    changePlayer();
+  }
+  
+  // Function that visually handles the attack and damage animations
+  function animateAttack(attackerId, defenderId) {
+    const attacker = document.getElementById(attackerId); // attacker sprite
+    const defender = document.getElementById(defenderId); // defender sprite
+    const sound = document.getElementById("SFX_PlayerDamage"); // hit sound
+  
+    // Update classList for animation
+    attacker.classList.remove("idle");
+    attacker.classList.add("attack");
+    defender.classList.remove("idle");
+    defender.classList.add("damage");
+    sound.play(); // play sound
+  
+    // After short delay, reset both sprites to idle state
+    setTimeout(() => {
+      attacker.classList.remove("attack");
+      attacker.classList.add("idle");
+      defender.classList.remove("damage");
+      defender.classList.add("idle");
+    }, 350);
+  }
+  
+  // Function to switch turns between players
+  function changePlayer() {
+    // Toggle turn value
+    gameState.whoseTurn = gameState.whoseTurn === 1 ? 2 : 1;
+  
+    // Update the text that shows whose turn it is
+    document.getElementById("playerName").innerText = `Player ${gameState.whoseTurn}`;
+  
+    // Grab both attack buttons
+    const playerOneAttack = document.getElementById("playerOneAttack");
+    const playerTwoAttack = document.getElementById("playerTwoAttack");
+  
+    // If it's Player 1's turn...
     if (gameState.whoseTurn === 1) {
-        let playerTwoHealth = document.getElementById("playerTwoHealth");
-        // conversts the innerHTML from string to a number and stores it in a variable
-        let playerTwoHealthNum = Number(playerTwoHealth.innerHTML);
-        // reduces by 10
-        playerTwoHealthNum -= 10;
-        // resets the HTML to the new value
-        playerTwoHealth.innerHTML = playerTwoHealthNum;
-
-        // checks if the player has reached 0 health
-        if (playerTwoHealthNum <= 0) {
-            // ensures health does not dig into the negative
-            playerTwoHealth = 0;
-            // ends the game
-            gameOver();
-        }
-        else {
-            // switch to the next player and change the UI's display / behavior
-            gameState.whoseTurn = 2;
-
-            // grabs the 'playerName' element and changes the player's turn display
-            let playerName = document.getElementById("playerName");
-            playerName.innerHTML = `Player ${gameState.whoseTurn}`;
-        }
+      playerOneAttack.disabled = false; // enable Player 1's attack button
+      playerTwoAttack.disabled = true;  // disable Player 2's attack button
+      playerOneAttack.classList.add("active");
+      playerOneAttack.classList.remove("inactive");
+      playerTwoAttack.classList.add("inactive");
+      playerTwoAttack.classList.remove("active");
     }
-}
-
-// if a player's health reaches 0 at the end of a turn, the game ends
-// and the winner is announced
-function gameOver() {
-    let title = document.getElementById("title");
-    title.style = "display: none;";
-    let playerTurnDisplay = document.getElementById("playerTurn");
-    playerTurnDisplay.style = "display: none;";
-
-    let winningPlayer = document.getElementById("winningPlayer");
-    winningPlayer.innerHTML = `Player ${gameState.whoseTurn} wins!`
-
-    let gameOverScreen = document.getElementById("gameOverScreen");
-    gameOverScreen.style = "display: flex; flex-direction: column;";
-}
-
-// function that allows the player two attack button to reduce the player two's
-// health
-function attackPlayerTwo() {
-    // compartmentalized function that will switch the player 2 attack button to inactive
-    // and player 1 attack button to active using DOM manipulation
-    // this also DISABLES the button, meaning they are not interactable
-    function changeButtonStatus() {
-        let playerTwoAttackButton = document.getElementById("playerTwoAttack");
-        playerTwoAttackButton.disabled = true;
-        playerTwoAttackButton.classList.add("inactive");
-        playerTwoAttackButton.classList.remove("active");
-
-        let playerOneAttackButton = document.getElementById("playerOneAttack");
-        playerOneAttackButton.disabled = false;
-        playerOneAttackButton.classList.add("active");
-        playerOneAttackButton.classList.remove("inactive");
+    // If it's Player 2's turn...
+    else {
+      playerOneAttack.disabled = true;
+      playerTwoAttack.disabled = false;
+      playerOneAttack.classList.add("inactive");
+      playerOneAttack.classList.remove("active");
+      playerTwoAttack.classList.add("active");
+      playerTwoAttack.classList.remove("inactive");
     }
-
-    // commpartmentalized function that changes the player 1's sprite using the array
-    // containing multiple images
-    function animatePlayer() {
-        // an array containing the images using in player one's animation
-        // the indices are later used to cycle / "animate" when the player attacks
-        let playerOneFrames = [
-            "./images/R_Idle.png",
-            "./images/R_Attack.png"
-        ];
-
-        let playerSprite = document.getElementById("playerOneSprite");
-        // function we will call in setTimeout, before the frames change back
-        // the idle stance
-        // in other words, we set to the attack sprite, wait 3 seconds,
-        // then set it back to the idle sprite
-        playerSprite.src = playerOneFrames[1];
-        
-        // removes the 'idle' class from the player sprite
-        playerSprite.classList.remove("idle");
-        // adds the 'attack' class to the player sprite
-        // ** CHECK THE CSS TO NOTE THE CHANGES MADE **
-        playerSprite.classList.add("attack");
-
-        // grabs the enemy sprite
-        let enemySprite = document.getElementById("playerTwoSprite");
-        let enemyDamage = document.getElementById("SFX_PlayerDamage");
-        // removes the 'idle' class from the enemy sprite
-        enemySprite.classList.remove("idle");
-        // adds the 'attack' class to the enemy sprite
-        // ** CHECK THE CSS TO NOTE THE CHANGES MADE **
-        enemySprite.classList.add("damage");
-        // sound that plays when enemy takes damage
-        enemyDamage.play();
-
-        // the function we will call in the setTimeOut method below
-        // after 350 milliseconds
-        // this function will execute this block of code
-        function changePlayerOneSprite() {
-            enemySprite.classList.remove("damage");
-            enemySprite.classList.add("idle");
-
-            playerSprite.src = playerOneFrames[0];
-            playerSprite.classList.remove("attack");
-            playerSprite.classList.add("idle");
-        }
-
-        setTimeout(changePlayerOneSprite, 350);
-    }
-
-    // for easy reading,
-    // we do not include ALL of the above code within this condition
-    // instead, we create higher-order functions to keep the code neat and readable
-    if (gameState.whoseTurn === 1) {
-        animatePlayer();
-        changeButtonStatus();
-        changePlayer();
-    }
-}
-
-function attackPlayerOne() {
-    if (gameState.whoseTurn === 2) {
-        let playerOneHealth = document.getElementById("playerOneHealth");
-        let playerOneHealthNum = Number(playerOneHealth.innerHTML);
-        playerOneHealthNum -= 10;
-        playerOneHealth.innerHTML = playerOneHealthNum;
-
-        if (playerOneHealth <= 0) {
-            playerOneHealth = 0;
-            gameOver();
-        } else {
-            changePlayer();
-        }
-    }
-}
+  }
+  
+  // Function that displays the Game Over screen and disables both buttons
+  function gameOver() {
+    gameState.gameOver = true; // mark game as over
+  
+    // Hide title and turn indicator
+    document.getElementById("title").style.display = "none";
+    document.getElementById("playerTurn").style.display = "none";
+  
+    // Reveal game over message and winner
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    const winningPlayer = document.getElementById("winningPlayer");
+    gameOverScreen.style.display = "flex";
+    gameOverScreen.style.flexDirection = "column";
+    winningPlayer.innerText = `Player ${gameState.whoseTurn} wins!`;
+  
+    // Disable both attack buttons
+    document.getElementById("playerOneAttack").disabled = true;
+    document.getElementById("playerTwoAttack").disabled = true;
+  }
+  
+  
