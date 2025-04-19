@@ -1,5 +1,3 @@
-
-
 // Track the state of the game, including how many players, whose turn, and if it's over
 let gameState = {
     players: 2, // total players in the game
@@ -61,7 +59,13 @@ let gameState = {
     const defender = document.getElementById(defenderId); // defender sprite
     const sound = document.getElementById("SFX_PlayerDamage"); // hit sound
   
-    // Update classList for animation
+    // Change attacker's image to attack pose
+    if (attackerId === "playerOneSprite") {
+      attacker.src = "R_Attack.png"; // Player 1 attack image
+    } else if (attackerId === "playerTwoSprite") {
+      attacker.src = "L_Attack.png"; // Player 2 attack image
+    }
+  
     attacker.classList.remove("idle");
     attacker.classList.add("attack");
     defender.classList.remove("idle");
@@ -74,6 +78,13 @@ let gameState = {
       attacker.classList.add("idle");
       defender.classList.remove("damage");
       defender.classList.add("idle");
+  
+      // Reset attacker's image to idle pose
+      if (attackerId === "playerOneSprite") {
+        attacker.src = "R_Idle.png";
+      } else if (attackerId === "playerTwoSprite") {
+        attacker.src = "L_Idle.png";
+      }
     }, 350);
   }
   
@@ -128,5 +139,4 @@ let gameState = {
     document.getElementById("playerOneAttack").disabled = true;
     document.getElementById("playerTwoAttack").disabled = true;
   }
-  
   

@@ -3,6 +3,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    font-family: 'Orbitron', sans-serif;
 }
 
 #gameOverScreen {
@@ -38,8 +39,19 @@ body {
 .active {
     background-color: red;
 }
+@keyframes float-circle {
+    0%   { transform: translate(0px, 0px); }
+    25%  { transform: translate(10px, -10px); }
+    50%  { transform: translate(0px, -20px); }
+    75%  { transform: translate(-10px, -10px); }
+    100% { transform: translate(0px, 0px); }
+  }
+  
+  
+  
 
 .idle {
+    animation: float-circle 2s ease-in-out infinite;
     height: 350px;
     width: 350px;
     background-color: none;
@@ -84,4 +96,8 @@ button {
 .title {
     font-size: 100px;
     font-weight: 6px;
+    color:white;
+     
+      }
+      
 }
