@@ -113,23 +113,33 @@ let gameState = {
   }
   
   // Function that displays the Game Over screen and disables both buttons
-  function gameOver() {
-    gameState.gameOver = true;
-    document.getElementById("title").style.display = "none";
-    document.getElementById("playerTurn").style.display = "none";
-    document.getElementById("fightingSpace").style.display = "none";
-    const gameOverScreen = document.getElementById("gameOverScreen");
-    const winningPlayer = document.getElementById("winningPlayer");
-    gameOverScreen.style.display = "flex";
-    gameOverScreen.style.flexDirection = "column";
-    winningPlayer.innerText = `Player ${gameState.whoseTurn} wins!`;
-    const winnerImage = document.createElement("img");
-    winnerImage.src = gameState.whoseTurn === 1 ? "winner.png" : "winner2.png";
-    winnerImage.alt = "Winner Image";
-    winnerImage.style.width = "300px";
-    winnerImage.style.marginTop = "20px";
-    gameOverScreen.appendChild(winnerImage);
-    document.getElementById("playerOneAttack").disabled = true;
-    document.getElementById("playerTwoAttack").disabled = true;
-  } 
+function gameOver() {
+  // Mark the game as over
+  gameState.gameOver = true;
+
+  // Hide gameplay elements
+  document.getElementById("title").style.display = "none";
+  document.getElementById("playerTurn").style.display = "none";
+  document.getElementById("fightingSpace").style.display = "none";
+
+  // Show the game over screen
+  const gameOverScreen = document.getElementById("gameOverScreen");
+  gameOverScreen.style.display = "flex";
+  gameOverScreen.style.flexDirection = "column";
+
+  // Display the winning message
+  const winningPlayer = document.getElementById("winningPlayer");
+  winningPlayer.innerText = `Player ${gameState.whoseTurn} wins!`;
+
+  // Create and display the winner image
+  const winnerImage = document.createElement("img");
+  winnerImage.src = gameState.whoseTurn === 1 ? "winner.png" : "winner2.png";
+  winnerImage.alt = "Winner Image";
+  winnerImage.classList.add("winner-img"); // Use external CSS class for styling
+  gameOverScreen.appendChild(winnerImage);
+
+  // Disable both attack buttons
+  document.getElementById("playerOneAttack").disabled = true;
+  document.getElementById("playerTwoAttack").disabled = true;
+}
   
