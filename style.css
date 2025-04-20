@@ -107,3 +107,32 @@ button {
     font-family: 'Orbitron', sans-serif;
       
 }
+.winningmessage {
+    animation: spinIn 1s ease-out forwards;
+    font-size: 50px;
+    font-weight: 6px;
+    color:greenyellow;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+      
+}
+@keyframes spinIn {
+    0% {
+      transform: rotate(-720deg) scale(0);
+      opacity: 0;
+    }
+    100% {
+      transform: rotate(0deg) scale(1);
+      opacity: 1;
+    }
+  };
+
+
+.turn {
+    font-size: 25px;
+    font-weight: 6px;
+    color:red;
+    text-align: center;
+    font-family: 'Orbitron', sans-serif;
+      
+}
