@@ -94,7 +94,7 @@ button {
 }
 
 .title {
-    font-size: 100px;
+    font-size: 75px;
     font-weight: 6px;
     color:white;
      
@@ -185,4 +185,3 @@ button {
       opacity: 1;
       transform: scale(1);
     }
-  
