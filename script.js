@@ -27,13 +27,12 @@ let gameState = {
   }
   
   // Function triggered when Player 2 attacks Player 1
-  function attackPlayerOne() {
-    if (gameState.whoseTurn !== 2 || gameState.gameOver) return;
-    const playerOneHealth = document.getElementById("playerOneHealth");
-    const randomDamage = Math.floor(Math.random() * 11) + 5;
-    let newHealth = Math.max(0, Number(playerOneHealth.innerText) - randomDamage);
-    playerOneHealth.innerText = newHealth;
-  
+  function attackPlayerOne() { // This defines a function named attackPlayerOne.
+    if (gameState.whoseTurn !== 2 || gameState.gameOver) return; // check if its player two's turn. or if the ganme is over.
+    const playerOneHealth = document.getElementById("playerOneHealth"); // Retrieves the HTML element that displays Player One’s health by its ID ("playerOneHealth"), and stores it in a constant named playerOneHealth.
+    const randomDamage = Math.floor(Math.random() * 11) + 5; //v This generates a random number between 5 and 15, which will be the damage dealt to Player One.
+    let newHealth = Math.max(0, Number(playerOneHealth.innerText) - randomDamage); // subtracts the value of randomDamage from Player One’s current health. The Math.max function ensures that the health does not go below 0.
+    playerOneHealth.innerText = newHealth; // This updates the text content of the HTML element with the new health value.
     // Show damage popup
     showDamage("playerOne", randomDamage);
   
