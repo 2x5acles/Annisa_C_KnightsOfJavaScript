@@ -1,146 +1,160 @@
-// Track the state of the game, including how many players, whose turn, and if it's over
-let gameState = {
-    players: 2, // total players in the game
-    whoseTurn: 1, // starts with Player 1
-    gameOver: false // flag to track if game has ended
-  };
-  
-  // Function triggered when Player 1 attacks Player 2
-  function attackPlayerTwo() {.     // This defines a function named attackPlayerTwo. It doesn’t take any parameters and will be triggered by a button to simulate an attack on "Player Two". 
-    if (gameState.whoseTurn !== 1 || gameState.gameOver) return; //check if its player one's turn. or if the ganme is over.
-    const playerTwoHealth = document.getElementById("playerTwoHealth"); // This retrieves the DOM element with the ID "playerTwoHealth", which likely displays Player Two’s current health, and stores it in the variable playerTwoHealth.
-    const randomDamage = Math.floor(Math.random() * 11) + 5; // Multiplies that decimal by 11, resulting in a decimal between 0 and just under 11.
-    let newHealth = Math.max(0, Number(playerTwoHealth.innerText) - randomDamage); // This gets the text content inside the HTML element with the ID "playerTwoHealth". Subtracts the value of randomDamage  from Player Two’s current health.
+// Track the state of the game
+const gameState = {
+    players: 2,
+    whoseTurn: 1,
+    gameOver: false,
+};
 
+// --- Player Health Elements ---
+const playerOneHealthEl = document.getElementById("playerOneHealth");
+const playerTwoHealthEl = document.getElementById("playerTwoHealth");
 
-    playerTwoHealth.innerText = newHealth;
-  
-    // Show damage popup
-    showDamage("playerTwo", randomDamage);
-  
-    animateAttack("playerOneSprite", "playerTwoSprite");
-    if (newHealth <= 0) {
-      gameOver();
-      return;
+// --- Player Sprite Elements ---
+const playerOneSpriteEl = document.getElementById("playerOneSprite");
+const playerTwoSpriteEl = document.getElementById("playerTwoSprite");
+
+// --- Attack Button Elements ---
+const playerOneAttackBtn = document.getElementById("playerOneAttack");
+const playerTwoAttackBtn = document.getElementById("playerTwoAttack");
+
+// --- Audio Element ---
+const damageSfx = document.getElementById("SFX_PlayerDamage");
+
+/**
+ * Handles an attack from one player to another.
+ * @param {number} attacker - The player number who is attacking (1 or 2).
+ */
+function attack(attacker) {
+    // Exit if it's not the attacker's turn or if the game is over
+    if (gameState.whoseTurn !== attacker || gameState.gameOver) {
+        return;
     }
-    changePlayer();
-  }
-  
-  // Function triggered when Player 2 attacks Player 1
-  function attackPlayerOne() { // This defines a function named attackPlayerOne.
-    if (gameState.whoseTurn !== 2 || gameState.gameOver) return; // check if its player two's turn. or if the ganme is over.
-    const playerOneHealth = document.getElementById("playerOneHealth"); // Retrieves the HTML element that displays Player One’s health by its ID ("playerOneHealth"), and stores it in a constant named playerOneHealth.
-    const randomDamage = Math.floor(Math.random() * 11) + 5; //v This generates a random number between 5 and 15, which will be the damage dealt to Player One.
-    let newHealth = Math.max(0, Number(playerOneHealth.innerText) - randomDamage); // subtracts the value of randomDamage from Player One’s current health. The Math.max function ensures that the health does not go below 0.
-    playerOneHealth.innerText = newHealth; // This updates the text content of the HTML element with the new health value.
-    // Show damage popup
-    showDamage("playerOne", randomDamage);
-  
-    animateAttack("playerTwoSprite", "playerOneSprite");
+
+    // Determine who the defender is and which elements to use
+    const isPlayerOneAttacking = attacker === 1;
+    const defenderHealthEl = isPlayerOneAttacking ? playerTwoHealthEl : playerOneHealthEl;
+    const attackerSpriteEl = isPlayerOneAttacking ? playerOneSpriteEl : playerTwoSpriteEl;
+    const defenderSpriteEl = isPlayerOneAttacking ? playerTwoSpriteEl : playerOneSpriteEl;
+    const defenderId = isPlayerOneAttacking ? "playerTwo" : "playerOne";
+
+    // Calculate random damage
+    const randomDamage = Math.floor(Math.random() * 11) + 5; // Damage between 5 and 15
+    const currentHealth = Number(defenderHealthEl.innerText);
+    const newHealth = Math.max(0, currentHealth - randomDamage);
+
+    // Update health and display damage
+    defenderHealthEl.innerText = newHealth;
+    showDamage(defenderId, randomDamage);
+    animateAttack(attackerSpriteEl, defenderSpriteEl);
+
+    // Check for game over condition
     if (newHealth <= 0) {
-      gameOver();
-      return;
+        endGame();
+    } else {
+        changePlayer();
     }
-    changePlayer();
-  }
-  
-  // Function to display damage popup text above the player
-  function showDamage(playerId, damageAmount) {
+}
+
+/**
+ * Creates a temporary popup to show the damage dealt.
+ * @param {string} playerId - The ID of the player element receiving damage.
+ * @param {number} damageAmount - The amount of damage.
+ */
+function showDamage(playerId, damageAmount) {
     const playerDiv = document.getElementById(playerId);
+    if (!playerDiv) return;
+
     const damageText = document.createElement("div");
     damageText.className = "damage-popup";
     damageText.innerText = `-${damageAmount}`;
     playerDiv.appendChild(damageText);
-  
+
+    // Remove the damage text after a short delay
     setTimeout(() => {
-      playerDiv.removeChild(damageText);
+        damageText.remove();
     }, 800);
-  }
-  
-  // Function that visually handles the attack and damage animations
-  function animateAttack(attackerId, defenderId) {
-    const attacker = document.getElementById(attackerId);
-    const defender = document.getElementById(defenderId);
-    const sound = document.getElementById("SFX_PlayerDamage");
-  
-    if (attackerId === "playerOneSprite") {
-      attacker.src = "R_Attack.png";
-    } else if (attackerId === "playerTwoSprite") {
-      attacker.src = "L_Attack.png";
-    }
-  
-    attacker.classList.remove("idle");
-    attacker.classList.add("attack");
-    defender.classList.remove("idle");
-    defender.classList.add("damage");
-    sound.play();
-  
+}
+
+/**
+ * Animates the attack and damage sprites.
+ * @param {HTMLElement} attackerEl - The attacker's sprite element.
+ * @param {HTMLElement} defenderEl - The defender's sprite element.
+ */
+function animateAttack(attackerEl, defenderEl) {
+    const isPlayerOneAttacking = attackerEl.id === "playerOneSprite";
+    
+    // Change sprite to attack animation
+    attackerEl.src = isPlayerOneAttacking ? "R_Attack.png" : "L_Attack.png";
+    
+    // Add animation classes
+    attackerEl.classList.remove("idle");
+    attackerEl.classList.add("attack");
+    defenderEl.classList.remove("idle");
+    defenderEl.classList.add("damage");
+    damageSfx.play();
+
+    // Revert to idle animation after a delay
     setTimeout(() => {
-      attacker.classList.remove("attack");
-      attacker.classList.add("idle");
-      defender.classList.remove("damage");
-      defender.classList.add("idle");
-  
-      if (attackerId === "playerOneSprite") {
-        attacker.src = "R_Idle.png";
-      } else if (attackerId === "playerTwoSprite") {
-        attacker.src = "L_Idle.png";
-      }
+        attackerEl.classList.remove("attack");
+        attackerEl.classList.add("idle");
+        defenderEl.classList.remove("damage");
+        defenderEl.classList.add("idle");
+
+        attackerEl.src = isPlayerOneAttacking ? "R_Idle.png" : "L_Idle.png";
     }, 350);
-  }
-  
-  // Function to switch turns between players
-  function changePlayer() {
+}
+
+/**
+ * Switches the turn to the next player and updates the UI.
+ */
+function changePlayer() {
     gameState.whoseTurn = gameState.whoseTurn === 1 ? 2 : 1;
     document.getElementById("playerName").innerText = `Player ${gameState.whoseTurn}`;
-    const playerOneAttack = document.getElementById("playerOneAttack");
-    const playerTwoAttack = document.getElementById("playerTwoAttack");
-  
-    if (gameState.whoseTurn === 1) {
-      playerOneAttack.disabled = false;
-      playerTwoAttack.disabled = true;
-      playerOneAttack.classList.add("active");
-      playerOneAttack.classList.remove("inactive");
-      playerTwoAttack.classList.add("inactive");
-      playerTwoAttack.classList.remove("active");
-    } else {
-      playerOneAttack.disabled = true;
-      playerTwoAttack.disabled = false;
-      playerOneAttack.classList.add("inactive");
-      playerOneAttack.classList.remove("active");
-      playerTwoAttack.classList.add("active");
-      playerTwoAttack.classList.remove("inactive");
-    }
-  }
-  
-  // Function that displays the Game Over screen and disables both buttons
-function gameOver() {
-  // Mark the game as over
-  gameState.gameOver = true;
 
-  // Hide gameplay elements
-  document.getElementById("title").style.display = "none";
-  document.getElementById("playerTurn").style.display = "none";
-  document.getElementById("fightingSpace").style.display = "none";
+    const isPlayerOneTurn = gameState.whoseTurn === 1;
 
-  // Show the game over screen
-  const gameOverScreen = document.getElementById("gameOverScreen");
-  gameOverScreen.style.display = "flex";
-  gameOverScreen.style.flexDirection = "column";
+    // Toggle button disabled state and active/inactive classes
+    playerOneAttackBtn.disabled = !isPlayerOneTurn;
+    playerTwoAttackBtn.disabled = isPlayerOneTurn;
 
-  // Display the winning message
-  const winningPlayer = document.getElementById("winningPlayer");
-  winningPlayer.innerText = `Player ${gameState.whoseTurn} wins!`;
-
-  // Create and display the winner image
-  const winnerImage = document.createElement("img");
-  winnerImage.src = gameState.whoseTurn === 1 ? "winner.png" : "winner2.png";
-  winnerImage.alt = "Winner Image";
-  winnerImage.classList.add("winner-img"); // Use external CSS class for styling
-  gameOverScreen.appendChild(winnerImage);
-
-  // Disable both attack buttons
-  document.getElementById("playerOneAttack").disabled = true;
-  document.getElementById("playerTwoAttack").disabled = true;
+    playerOneAttackBtn.classList.toggle("active", isPlayerOneTurn);
+    playerOneAttackBtn.classList.toggle("inactive", !isPlayerOneTurn);
+    playerTwoAttackBtn.classList.toggle("active", !isPlayerOneTurn);
+    playerTwoAttackBtn.classList.toggle("inactive", isPlayerOneTurn);
 }
-  
+
+/**
+ * Ends the game and displays the winner.
+ */
+function endGame() {
+    gameState.gameOver = true;
+
+    // Hide gameplay UI and show the game over screen
+    document.getElementById("title").style.display = "none";
+    document.getElementById("playerTurn").style.display = "none";
+    document.getElementById("fightingSpace").style.display = "none";
+    
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    gameOverScreen.style.display = "flex";
+    
+    // Display the winner's name
+    document.getElementById("winningPlayer").innerText = `Player ${gameState.whoseTurn} wins!`;
+
+    // Create and display the winner's image if it doesn't already exist
+    if (!gameOverScreen.querySelector(".winner-img")) {
+        const winnerImage = document.createElement("img");
+        winnerImage.src = gameState.whoseTurn === 1 ? "winner.png" : "winner2.png";
+        winnerImage.alt = "Winner Image";
+        winnerImage.className = "winner-img";
+        gameOverScreen.appendChild(winnerImage);
+    }
+
+    // Ensure both attack buttons are disabled
+    playerOneAttackBtn.disabled = true;
+    playerTwoAttackBtn.disabled = true;
+}
+
+// --- Event Listeners ---
+// Assign the single attack function to both buttons
+playerOneAttackBtn.addEventListener('click', () => attack(1));
+playerTwoAttackBtn.addEventListener('click', () => attack(2));
